@@ -24,6 +24,12 @@ Resources:
         FromPort: 80
         ToPort: 80
         SourceSecurityGroupId: !Ref LoadBalancerSecurityGroup
+      SecurityGroupEgress:
+      - IpProtocol: "tcp"
+        FromPort: 80
+        ToPort: 80
+        CidrIp: "0.0.0.0/0"  
+
   LaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
     Properties: 
@@ -75,6 +81,11 @@ Resources:
       - IpProtocol: tcp
         FromPort: 80
         ToPort: 80
+        CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+      - IpProtocol: tcp
+        FromPort: 0
+        ToPort: 65535
         CidrIp: 0.0.0.0/0
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
