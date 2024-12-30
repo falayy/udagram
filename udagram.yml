@@ -32,26 +32,13 @@ Resources:
           Fn::Base64: !Sub |
             #!/bin/bash 
             # Update and install necessary packages
+            exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
             apt-get update -y
-            apt-get install -y nginx curl unzip
-            # Install AWS CLI if not already installed
-            if ! command -v aws &> /dev/null
-            then
-                curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-                unzip awscliv2.zip
-                sudo ./aws/install
-                rm -f awscliv2.zip  # Clean up the zip file after install
-            fi
-            # Start NGINX service
-            service nginx start
-            # Clear the existing index file, if any
-            rm -f /var/www/html/index.*
-            # Ensure proper permissions on the web directory
-            sudo chmod 777 /var/www/html
-            # Download the file from S3
-            aws s3 cp s3://udacity-webapp-bucket/index.html /var/www/html/
-            # Reload nginx to apply changes
-            sudo systemctl reload nginx
+            apt-get install apache2 -y
+            systemctl start apache2.service
+            systemctl enable apache2
+            cd /var/www/html
+            echo "Udacity Demo Web Server Up and Running!" > index.html   
         ImageId: ami-0866a3c8686eaeeba
         SecurityGroupIds:
           - !Ref SecurityGroup
